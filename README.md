@@ -22,3 +22,5 @@ we have create two subnets. public and private.
 
 6. Get output of IP address of aws ec2 instance.
 
+7. Attach elastic ip to ec2 instance.
+if use elastic ip, it is chargable in aws. 
