@@ -14,7 +14,7 @@ resource "aws_instance" "web" {
   echo "*** Installing apache2"
   sudo apt update -y
   sudo apt install apache2 -y
-  echo “Hello World from $(hostname -f) from the availability zone: $REGION_AV_ZONE” > /var/www/html/index.html
+  echo "<h1>Deployed via Terraform</h1>" | sudo tee /var/www/html/index.html
   EOF
 
   tags = {
