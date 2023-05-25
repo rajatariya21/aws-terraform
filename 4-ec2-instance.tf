@@ -18,6 +18,6 @@ resource "aws_instance" "web" {
   EOF
 
   tags = {
-    Name = "demo-vm2"
+    Name = "demo-vm-${count.index}"
   }
 }
