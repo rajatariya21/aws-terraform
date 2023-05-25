@@ -15,7 +15,9 @@ resource "aws_vpc" "test-vpc" {
 # resource "aws_subnet" "public" {
 #   vpc_id                  = aws_vpc.test-vpc.id
 #   cidr_block              = "10.0.1.0/24"
-#   availability_zone       = "${data.aws_availability_zones.available.names[0]}"
+
+#   availability_zone       = "us-east-1a"
+
 #   map_public_ip_on_launch = "true"
 
 #   tags = {
@@ -31,15 +33,16 @@ resource "aws_subnet" "public" {
   tags = {
     "Name" = "Application-1-public"
   }
+
 }
 # resource "aws_subnet" "private" {
-#   vpc_id            = aws_vpc.test-vpc.id
-#   cidr_block        = "10.0.2.0/24"
-#   availability_zone = "${data.aws_availability_zones.available.names[1]}"
+#  vpc_id = "${aws_vpc.test-vpc.id}"
+#  cidr_block = "10.0.2.0/24"
+#  availability_zone = "us-east-1b"
 
-#   tags = {
-#     Name = "test_private_subnet"
-#   }
+#  tags = {
+#   Name = "test_private_subnet"
+#  }
 # }
 
 resource "aws_subnet" "private" {
@@ -51,6 +54,7 @@ resource "aws_subnet" "private" {
     "Name" = "Application-1-private"
   }
 }
+
 # Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.test-vpc.id
@@ -79,16 +83,16 @@ resource "aws_route_table" "rt" {
 #   subnet_id      = aws_subnet.public.id
 #   route_table_id = aws_route_table.rt.id
 # }
-# resource "aws_route_table_association" "b" {
-#   subnet_id      = aws_subnet.private.id
-#   route_table_id = aws_route_table.rt.id
-# }
 
 resource "aws_route_table_association" "public" {
   count          = length(var.subnet_cidr_public)
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = aws_route_table.rt.id
 }
+# resource "aws_route_table_association" "b" {
+#  subnet_id = "${aws_subnet.private.id}"
+#  route_table_id = "${aws_route_table.rt.id}"
+# }
 
 resource "aws_route_table_association" "private" {
   count          = length(var.subnet_cidr_private)
