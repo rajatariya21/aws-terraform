@@ -9,11 +9,15 @@ resource "aws_vpc" "test-vpc" {
   }
 }
 
+# data "aws_availability_zones" "available" {}
+
 # Create subnets
 # resource "aws_subnet" "public" {
 #   vpc_id                  = aws_vpc.test-vpc.id
 #   cidr_block              = "10.0.1.0/24"
+
 #   availability_zone       = "us-east-1a"
+
 #   map_public_ip_on_launch = "true"
 
 #   tags = {
@@ -29,6 +33,7 @@ resource "aws_subnet" "public" {
   tags = {
     "Name" = "Application-1-public"
   }
+
 }
 # resource "aws_subnet" "private" {
 #  vpc_id = "${aws_vpc.test-vpc.id}"
@@ -39,6 +44,16 @@ resource "aws_subnet" "public" {
 #   Name = "test_private_subnet"
 #  }
 # }
+
+resource "aws_subnet" "private" {
+  count             = length(var.subnet_cidr_private)
+  vpc_id            = aws_vpc.test-vpc.id
+  cidr_block        = var.subnet_cidr_private[count.index]
+  availability_zone = var.availability_zone_private[count.index]
+  tags = {
+    "Name" = "Application-1-private"
+  }
+}
 
 # Internet Gateway
 resource "aws_internet_gateway" "gw" {
@@ -79,3 +94,8 @@ resource "aws_route_table_association" "public" {
 #  route_table_id = "${aws_route_table.rt.id}"
 # }
 
+resource "aws_route_table_association" "private" {
+  count          = length(var.subnet_cidr_private)
+  subnet_id      = element(aws_subnet.private.*.id, count.index)
+  route_table_id = aws_route_table.rt.id
+}

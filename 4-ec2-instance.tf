@@ -6,7 +6,6 @@ resource "aws_instance" "web" {
   associate_public_ip_address = "true"
   key_name      = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = ["${aws_security_group.allow_tls.id}"]
-  # subnet_id              = "${aws_subnet.public.id}"
   subnet_id = element(aws_subnet.public.*.id, count.index)
 
   user_data = <<-EOF
