@@ -22,3 +22,13 @@ variable "availability_zone_private" {
   default     = ["us-east-1d", "us-east-1e", "us-east-1f"]
   type        = list(any)
 }
+
+# variable "domain_name" {
+#   type    = string
+#   default = "application-lb-1586040121.us-east-1.elb.amazonaws.com"
+# }
+
+# variable "alternative_name" {
+#   type    = string
+#   default = "*.application-lb-1586040121.us-east-1.elb.amazonaws.com"
+# }

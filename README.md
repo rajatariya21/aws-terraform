@@ -28,3 +28,5 @@ if use elastic ip, it is chargable in aws.
 8. Add application load balancer to ec2.
 
 9. Assign variables to define centrally controlled reusable values.
+
+10. Please apply ca-key.tf after above resource creation, afterwards apply acm.tf file.
