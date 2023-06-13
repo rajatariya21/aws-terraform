@@ -65,6 +65,24 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+resource "aws_alb_listener" "alb_front_https" {
+	load_balancer_arn	=	"${aws_lb.application_load_balancer.arn}"
+	port			        =	"443"
+	protocol		      =	"HTTPS"
+	ssl_policy		    =	"ELBSecurityPolicy-2016-08"
+	certificate_arn		=	"${aws_iam_server_certificate.aws_certificate.arn}"
+
+	default_action {
+		type			=	"redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+	}
+}
+
 # ALB target group attachment
 resource "aws_lb_target_group_attachment" "ec2_attach" {
   count            = length(aws_instance.web)

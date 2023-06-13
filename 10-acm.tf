@@ -4,12 +4,12 @@
 # #   certificate_chain=file("server.csr")
 #   }
 
-resource "aws_iam_server_certificate" "aws_certificate" {
-  name             = "atariyaCA"
-  certificate_body = "${file("./certs/atariyaCA.crt")}"
-  private_key      = "${file("./certs/atariyaCA.key")}"
+# resource "aws_iam_server_certificate" "aws_certificate" {
+#   name             = "atariyaCA"
+#   certificate_body = "${file("./certs/atariyaCA.crt")}"
+#   private_key      = "${file("./certs/atariyaCA.key")}"
 
-}
+# }
 
 
 
