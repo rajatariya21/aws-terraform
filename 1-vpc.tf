@@ -1,60 +1,81 @@
-# Create aws VPC
-resource "aws_vpc" "demovpc" {
-  cidr_block       = var.vpc_cidr
-  instance_tenancy = "default"
+# Create VPC
+resource "aws_vpc" "test-vpc" {
+  cidr_block           = "10.0.0.0/16"
+  instance_tenancy     = "default"
+  enable_dns_hostnames = "true"
+
   tags = {
-    Name = "Demo VPC"
+    Name = "Test VPC"
   }
 }
 
-# Create aws Internet gateway
-resource "aws_internet_gateway" "demogateway" {
-  vpc_id = aws_vpc.demovpc.id
-}
+# Create subnets
+# resource "aws_subnet" "public" {
+#   vpc_id                  = aws_vpc.test-vpc.id
+#   cidr_block              = "10.0.1.0/24"
+#   availability_zone       = "us-east-1a"
+#   map_public_ip_on_launch = "true"
 
-# Create aws public subnets
-# Creating 1st subnet 
-resource "aws_subnet" "demosubnet" {
-  vpc_id                  = aws_vpc.demovpc.id
-  cidr_block              = var.subnet_cidr
-  map_public_ip_on_launch = true
-  availability_zone       = "us-east-1a"
+#   tags = {
+#     Name = "test_public_subnet"
+#   }
+# }
+
+resource "aws_subnet" "public" {
+  count             = length(var.subnet_cidr_public)
+  vpc_id            = aws_vpc.test-vpc.id
+  cidr_block        = var.subnet_cidr_public[count.index]
+  availability_zone = var.availability_zone_public[count.index]
   tags = {
-    Name = "Demo subnet"
+    "Name" = "Application-1-public"
   }
 }
-# Creating 2nd subnet 
-resource "aws_subnet" "demosubnet1" {
-  vpc_id                  = aws_vpc.demovpc.id
-  cidr_block              = var.subnet1_cidr
-  map_public_ip_on_launch = true
-  availability_zone       = "us-east-1b"
+# resource "aws_subnet" "private" {
+#  vpc_id = "${aws_vpc.test-vpc.id}"
+#  cidr_block = "10.0.2.0/24"
+#  availability_zone = "us-east-1b"
+
+#  tags = {
+#   Name = "test_private_subnet"
+#  }
+# }
+
+# Internet Gateway
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.test-vpc.id
+
   tags = {
-    Name = "Demo subnet 1"
+    Name = "TEST VPC IG"
   }
 }
 
-# Create aws route table
-#Creating Route Table
-resource "aws_route_table" "route" {
-  vpc_id = aws_vpc.demovpc.id
+# Create Route Table
+resource "aws_route_table" "rt" {
+  vpc_id = aws_vpc.test-vpc.id
+
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.demogateway.id
+    gateway_id = aws_internet_gateway.gw.id
   }
+
   tags = {
-    Name = "Route to internet"
+    Name = "Route Table for aws service"
   }
 }
 
-# Create route table association
-resource "aws_route_table_association" "rt1" {
-  subnet_id      = aws_subnet.demosubnet.id
-  route_table_id = aws_route_table.route.id
-}
-resource "aws_route_table_association" "rt2" {
-  subnet_id      = aws_subnet.demosubnet1.id
-  route_table_id = aws_route_table.route.id
-}
+# Associating Public and Private Subnets to the Route Table
+# resource "aws_route_table_association" "a" {
+#   subnet_id      = aws_subnet.public.id
+#   route_table_id = aws_route_table.rt.id
+# }
 
+resource "aws_route_table_association" "public" {
+  count          = length(var.subnet_cidr_public)
+  subnet_id      = element(aws_subnet.public.*.id, count.index)
+  route_table_id = aws_route_table.rt.id
+}
+# resource "aws_route_table_association" "b" {
+#  subnet_id = "${aws_subnet.private.id}"
+#  route_table_id = "${aws_route_table.rt.id}"
+# }
 

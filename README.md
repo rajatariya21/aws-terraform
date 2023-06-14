@@ -24,7 +24,3 @@ we have create two subnets. public and private.
 
 7. Attach elastic ip to ec2 instance.
 if use elastic ip, it is chargable in aws. 
-
-8. Add application load balancer to ec2.
-
-9. Assign variables to define centrally controlled reusable values.
