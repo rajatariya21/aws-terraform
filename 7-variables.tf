@@ -26,3 +26,18 @@ variable "availability_zone_private" {
   default     = ["us-east-1d", "us-east-1e", "us-east-1f"]
   type        = list(any)
 }
+
+variable "domain_name" {
+  type    = string
+  default = "atariya.online"
+}
+
+variable "alternative_name" {
+  type    = string
+  default = "*.atariya.online"
+}
+
+variable "record_name" {
+  type    = string
+  default = "www"
+}

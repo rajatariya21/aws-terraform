@@ -12,3 +12,14 @@ output "ec2_global_ips" {
 output "alb-dns-name" {
   value = aws_lb.application_load_balancer.dns_name
 }
+
+
+output "domain_name" {
+    value = var.domain_name
+}
+
+
+output "certificate_arn" {
+    value = aws_acm_certificate.acm_certificate.arn
+}
+
