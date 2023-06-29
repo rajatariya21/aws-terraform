@@ -6,13 +6,13 @@ resource "aws_alb" "default" {
   enable_deletion_protection = false
   idle_timeout               = 3600
 
-  # subnets         = aws_subnet.public.*.id
+  subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.sg_lb.id]
-  subnets = [ # Referencing the default subnets
-    "${aws_default_subnet.default_subnet_a.id}",
-    "${aws_default_subnet.default_subnet_b.id}",
-    "${aws_default_subnet.default_subnet_c.id}"
-  ]
+  # subnets = [ # Referencing the default subnets
+  #   "${aws_default_subnet.default_subnet_a.id}",
+  #   "${aws_default_subnet.default_subnet_b.id}",
+  #   "${aws_default_subnet.default_subnet_c.id}"
+  # ]
 }
 
 # Create target group for lb
@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "tg_group" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_default_vpc.default_vpc.id # Referencing the default VPC
+  vpc_id      = aws_vpc.default.id # Referencing the default VPC
 
   health_check {
     healthy_threshold   = 3
@@ -48,7 +48,7 @@ resource "aws_lb_listener" "lb_listener" {
 # Add the load balancer security group resource 
 resource "aws_security_group" "sg_lb" {
   name   = "alb-security-group"
-  vpc_id = aws_default_vpc.default_vpc.id
+  vpc_id = aws_vpc.default.id
 
   ingress {
     protocol    = "tcp"

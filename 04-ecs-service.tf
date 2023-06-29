@@ -9,12 +9,12 @@ resource "aws_ecs_service" "my_first_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.tg_group.arn # Referencing our target group
     container_name   = "my-first-task"
-    container_port   = 80 # Specifying the container port
+    container_port   = 3000 # Specifying the container port
   }
 
   network_configuration {
-    # subnets          = aws_subnet.public.*.id
-    subnets          = ["${aws_default_subnet.default_subnet_a.id}", "${aws_default_subnet.default_subnet_b.id}", "${aws_default_subnet.default_subnet_c.id}"]
+    subnets          = aws_subnet.public.*.id
+    # subnets          = ["${aws_default_subnet.default_subnet_a.id}", "${aws_default_subnet.default_subnet_b.id}", "${aws_default_subnet.default_subnet_c.id}"]
     assign_public_ip = true # Providing our containers with public IPs
     security_groups = [aws_security_group.sg_lb.id, aws_security_group.service_security_group.id]
   }
@@ -22,7 +22,7 @@ resource "aws_ecs_service" "my_first_service" {
 
 resource "aws_security_group" "service_security_group" {
   name   = "ecs-security-group"
-  vpc_id = aws_default_vpc.default_vpc.id
+  vpc_id = aws_vpc.default.id
   ingress {
     from_port = 0
     to_port   = 0
