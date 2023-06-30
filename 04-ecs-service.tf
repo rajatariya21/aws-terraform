@@ -9,7 +9,7 @@ resource "aws_ecs_service" "my_first_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.tg_group.arn # Referencing our target group
     container_name   = "my-first-task"
-    container_port   = 3000 # Specifying the container port
+    container_port   = 80 # Specifying the container port
   }
 
   network_configuration {
