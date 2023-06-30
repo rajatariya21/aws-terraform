@@ -18,7 +18,7 @@ resource "aws_alb" "default" {
 # Create target group for lb
 resource "aws_lb_target_group" "tg_group" {
   name        = "target-group"
-  port        = 80
+  port        = "80"
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.default.id # Referencing the default VPC
@@ -40,8 +40,26 @@ resource "aws_lb_listener" "lb_listener" {
   port              = "80"
   protocol          = "HTTP"
   default_action {
+    type             = "redirect"
+    # target_group_arn = aws_lb_target_group.tg_group.arn # Referencing our tagrte group
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "lb_listner_https" {
+  load_balancer_arn = aws_alb.default.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "arn:aws:acm:us-east-1:932919696617:certificate/5334bc20-dc8c-49d4-9b44-f04903caca42"    # Need to create ssl certificate into AWS ACM
+
+  default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg_group.arn # Referencing our tagrte group
+    target_group_arn = aws_lb_target_group.tg_group.arn
   }
 }
 
@@ -53,7 +71,7 @@ resource "aws_security_group" "sg_lb" {
   ingress {
     protocol    = "tcp"
     from_port   = 80
-    to_port     = 80
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
   }
 
