@@ -1,5 +1,5 @@
 # Create Loadbalancer
-resource "aws_alb" "default" {
+resource "aws_lb" "default" {
   name                       = "ecs-lb"
   internal                   = false
   load_balancer_type         = "application"
@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "tg_group" {
 
 # Create listner for lb
 resource "aws_lb_listener" "lb_listener" {
-  load_balancer_arn = aws_alb.default.arn # Referencing our load balancer
+  load_balancer_arn = aws_lb.default.arn # Referencing our load balancer
   port              = "80"
   protocol          = "HTTP"
   default_action {
@@ -51,11 +51,12 @@ resource "aws_lb_listener" "lb_listener" {
 }
 
 resource "aws_lb_listener" "lb_listner_https" {
-  load_balancer_arn = aws_alb.default.arn
+  load_balancer_arn = aws_lb.default.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:us-east-1:932919696617:certificate/5334bc20-dc8c-49d4-9b44-f04903caca42"    # Need to create ssl certificate into AWS ACM
+  # certificate_arn   = "arn:aws:acm:us-east-1:932919696617:certificate/5334bc20-dc8c-49d4-9b44-f04903caca42"    # Need to create ssl certificate into AWS ACM
+  certificate_arn   = data.aws_acm_certificate.issued.arn  # Use issued acm certificate
 
   default_action {
     type             = "forward"
