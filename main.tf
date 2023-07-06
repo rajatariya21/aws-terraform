@@ -25,7 +25,7 @@ resource "aws_key_pair" "generated_key" {
 resource "aws_security_group" "allow_ports" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.default.id
+  # vpc_id      = aws_vpc.default.id
   dynamic "ingress" {
     for_each = [22, 80, 81, 8080, 443]
     iterator = port
@@ -48,29 +48,24 @@ resource "aws_security_group" "allow_ports" {
   }
 }
 
-# locals {
-#   subs = concat([aws_subnet.public.*.id], [aws_subnet.private.*.id])
-# }
-
 # Creting aws instance
 resource "aws_instance" "web" {
-  count         = 3
   ami           = var.ami
   instance_type = var.instance_type
   key_name      = aws_key_pair.generated_key.key_name
-  # key_name               = "ssh-test-key"
   vpc_security_group_ids = ["${aws_security_group.allow_ports.id}"]
-  # subnet_id              = ["${element(local.subs, count.index)}"]
-  subnet_id      = element(aws_subnet.public_subnets[*].id, count.index)
   associate_public_ip_address = true
   tags = {
-    Name = "demo-vm-${count.index}"
+    Name = "demo-vm"
   }
+  connection {
+     type        = "ssh"
+     host        = self.public_ip
+     user        = "ubuntu"
+     
+     # Mention the exact private key name which will be generated 
+     private_key = file("ec2-key.pem")
+     timeout     = "4m"
+   }
 }
-
-
-
-
-
-
-
+  
