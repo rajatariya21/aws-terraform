@@ -1,1 +1,1 @@
-Create acm certificate validate by email without using route53.
+Deploy multiple ec2 instances with multiple subnets.
