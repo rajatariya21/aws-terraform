@@ -41,14 +41,14 @@ resource "aws_vpc" "default" {
 # }
 
 resource "aws_subnet" "public_subnets" {
- count      = length(var.public_subnet_cidrs)
- vpc_id     = aws_vpc.default.id
- cidr_block = element(var.public_subnet_cidrs, count.index)
- availability_zone = element(var.azs, count.index)
+  count             = length(var.public_subnet_cidrs)
+  vpc_id            = aws_vpc.default.id
+  cidr_block        = element(var.public_subnet_cidrs, count.index)
+  availability_zone = element(var.azs, count.index)
 
- tags = {
-   Name = "Public Subnet ${count.index + 1}"
- }
+  tags = {
+    Name = "Public Subnet ${count.index + 1}"
+  }
 }
 
 # resource "aws_subnet" "private" {
@@ -59,14 +59,14 @@ resource "aws_subnet" "public_subnets" {
 # }
 
 resource "aws_subnet" "private_subnets" {
- count      = length(var.private_subnet_cidrs)
- vpc_id     = aws_vpc.default.id
- cidr_block = element(var.private_subnet_cidrs, count.index)
- availability_zone = element(var.azs, count.index)
- 
- tags = {
-   Name = "Private Subnet ${count.index + 1}"
- }
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.default.id
+  cidr_block        = element(var.private_subnet_cidrs, count.index)
+  availability_zone = element(var.azs, count.index)
+
+  tags = {
+    Name = "Private Subnet ${count.index + 1}"
+  }
 }
 
 # Internet Gateway
@@ -74,8 +74,8 @@ resource "aws_internet_gateway" "gateway" {
   vpc_id = aws_vpc.default.id
 
   tags = {
-   Name = "Test VPC IG"
- }
+    Name = "Test VPC IG"
+  }
 }
 
 # # Create AWS Route
@@ -95,21 +95,21 @@ resource "aws_route_table" "second_rt" {
     gateway_id = element(aws_internet_gateway.gateway.*.id, count.index)
   }
 
-   tags = {
-   Name = "2nd Route Table"
- }
+  tags = {
+    Name = "2nd Route Table"
+  }
 }
 
 
 # Associating Private Subnet to the Route Table
 resource "aws_route_table_association" "private" {
-  count = length(var.private_subnet_cidrs)
+  count          = length(var.private_subnet_cidrs)
   subnet_id      = element(aws_subnet.private_subnets[*].id, count.index)
   route_table_id = element(aws_route_table.second_rt.*.id, count.index)
 }
 
 resource "aws_route_table_association" "public" {
-  count = length(var.public_subnet_cidrs)
+  count          = length(var.public_subnet_cidrs)
   subnet_id      = element(aws_subnet.public_subnets[*].id, count.index)
   route_table_id = element(aws_route_table.second_rt.*.id, count.index)
 }
